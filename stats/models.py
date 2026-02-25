@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-class Teams(models.Model):
+class Team(models.Model):
     name = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
     founded_year = models.IntegerField()
@@ -15,7 +15,7 @@ class Teams(models.Model):
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
-    team = models.ForeignKey(Teams, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     position = models.CharField(max_length=50)
     age = models.IntegerField()
 
@@ -25,32 +25,38 @@ class Player(models.Model):
             f"Position: {self.position}, Age: {self.age}"
         )
 
-class Standings(models.Model):
-    team = models.ForeignKey(Teams, on_delete=models.CASCADE, null=True, blank=True)
-    games_played = models.IntegerField()
-    points = models.IntegerField()
-    wins = models.IntegerField()
-    losses = models.IntegerField()
-    draws = models.IntegerField()
-    goals_for = models.IntegerField()
-    goals_against = models.IntegerField()
+class Match(models.Model):
+    date = models.DateField()
+    time = models.TimeField()
+    venue = models.CharField(max_length=255)
+    home_team = models.ForeignKey(Team, related_name='home_matches', on_delete=models.CASCADE)
+    away_team = models.ForeignKey(Team, related_name='away_matches', on_delete=models.CASCADE)
+    match_status = models.TextField() # e.g., Scheduled, Ongoing/Live, Completed.
 
     def __str__(self):
         return (
-            f"Team: {self.team.name}, Games Played: {self.games_played}, "
-            f"Points: {self.points}, Wins: {self.wins}, Losses: {self.losses}, "
-            f"Draws: {self.draws}, Goals For: {self.goals_for}, "
-            f"Goals Against: {self.goals_against}"
+            f"Match: {self.home_team.name} vs {self.away_team.name} on {self.date} at {self.time} at {self.venue} - Status: {self.match_status}"
         )
+    
 
-class TopScorer(models.Model):
-    player_name = models.CharField(max_length=100)
-    team = models.ForeignKey(Teams, on_delete=models.CASCADE)
-    goals_scored = models.IntegerField()
-    games_played = models.IntegerField()
+class MatchEvents(models.Model):
+    class EventType(models.TextChoices):
+        GOAL = 'Goal', 'Goal'
+        ASSIST = 'Assist', 'Assist'
+        YELLOW_CARD = 'Yellow Card', 'Yellow Card'
+        RED_CARD = 'Red Card', 'Red Card'
+        OWN_GOAL = 'Own Goal', 'Own Goal'
+
+    match = models.ForeignKey(Match, on_delete=models.CASCADE)
+    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    event_type = models.CharField(
+        max_length = 50,
+        choices = EventType.choices,
+        default = EventType.GOAL
+        )
+    minute = models.PositiveIntegerField()  # Minute of the match when the event occurred
 
     def __str__(self):
         return (
-            f"Player: {self.player_name}, Team: {self.team.name}, "
-            f"Goals Scored: {self.goals_scored}, Games Played: {self.games_played}"
+            f"Event: {self.event_type} by {self.player.name} in {self.minute} minute of match {self.match}"
         )
