@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 from django.db.models import Q
 from django.utils.functional import cached_property
@@ -28,7 +30,9 @@ class Team(models.Model):
             'goals_for': 0,
             'goals_against': 0,
             'goal_difference': 0,
-            'points': 0}
+            'points': 0,
+            'win_percentage': 0
+        }
         
         for match in all_matches:
             stats['played'] += 1
@@ -57,7 +61,30 @@ class Team(models.Model):
                     stats['draws'] += 1
                     stats['points'] += 1
 
+        ''' Logic to calculate recent form - last 5 matches. Can be used to show 
+        form in standings page and also for future features like form-based predictions.
+        Points show you the Past, Form can tell you the Future'''
+        recent_matches = all_matches.order_by('-date')[:5]
+        recentForm = []
+        for match in recent_matches:
+            if match.home_team == self:
+                if match.home_score > match.away_score:
+                    recentForm.append('W')
+                elif match.home_score < match.away_score:
+                    recentForm.append('L')
+                else:
+                    recentForm.append('D')
+            else:
+                if match.away_score > match.home_score:
+                    recentForm.append('W')
+                elif match.away_score < match.home_score:
+                    recentForm.append('L')
+                else:
+                    recentForm.append('D')
+        
+        stats['form'] = recentForm[::-1]  # Reverse to show most recent form first
         stats['goal_difference'] = stats['goals_for'] - stats['goals_against']
+        stats['win_percentage'] = stats['wins'] / stats['played'] * 100 if stats['played'] > 0 else 0
         return stats
     
     @cached_property
@@ -71,6 +98,18 @@ class Team(models.Model):
     @property
     def points(self):
         return self.stats['points']
+
+    @property
+    def goal_difference(self):
+        return self.stats['goal_difference']
+
+    @property
+    def win_percentage(self):
+        return self.stats['win_percentage']
+    
+    @property
+    def form(self):
+        return self.stats['form']
 
 class Player(models.Model):
     name = models.CharField(max_length=100)

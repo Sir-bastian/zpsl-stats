@@ -1,0 +1,60 @@
+{% extends "stats/base.html" %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header bg-success text-white">
+        <h3 class="mb-0">ZPSL Official Standings - 2026</h3>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Rank</th>
+                    <th>Team</th>
+                    <th>P</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>GD</th>
+                    <th>Pts</th>
+                    <th>Win %</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                    {% with s=team.get_stats %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td class="fw-bold">{{ team.name }}</td>
+                        <td>{{ s.played }}</td>
+                        <td>{{ s.wins }}</td>
+                        <td>{{ s.draws }}</td>
+                        <td>{{ s.losses }}</td>
+                        <td>{{ s.goal_difference }}</td>
+                        <td class="text-primary"><strong>{{ s.points }}</strong></td>
+                        <td>
+                            <small class="text-muted">{{ s.win_percentage|floatformat:1 }}%</small>
+                        </td>
+                        <td>
+                            {% for result in s.form %}
+                                {% if result == 'W' %}
+                                    <span class="badge bg-success" style="width: 24px;">W</span>
+                                {% elif result == 'D' %}
+                                    <span class="badge bg-secondary" style="width: 24px;">D</span>
+                                {% else %}
+                                    <span class="badge bg-danger" style="width: 24px;">L</span>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endwith %}
+                {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">No teams found in the league.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -7,6 +7,7 @@ def index(request):
     return HttpResponse("Hello, world. Welcome to ZPSL Stats Hub - Coming soon.")
 
 def standings(request):
-    team = Team.objects.all()
+    teams = Team.objects.all()
+    sorted_teams = sorted(teams, key=lambda t: (t.points, t.goal_difference), reverse=True)
 
-    return HttpResponse("ZPSL Standings - Coming Soon!")
+    return render(request, 'stats/standings.html', {'teams': sorted_teams})
