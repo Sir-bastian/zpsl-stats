@@ -15,9 +15,12 @@
                     <th>W</th>
                     <th>D</th>
                     <th>L</th>
+                    <th>GF</th>
+                    <th>GA</th>
                     <th>GD</th>
                     <th>Pts</th>
                     <th>Win %</th>
+                    <th>Form</th>
                 </tr>
             </thead>
             <tbody>
@@ -30,6 +33,8 @@
                         <td>{{ s.wins }}</td>
                         <td>{{ s.draws }}</td>
                         <td>{{ s.losses }}</td>
+                        <td>{{ s.goals_for }}</td>
+                        <td>{{ s.goals_against }}</td>
                         <td>{{ s.goal_difference }}</td>
                         <td class="text-primary"><strong>{{ s.points }}</strong></td>
                         <td>
