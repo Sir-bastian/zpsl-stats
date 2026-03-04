@@ -10,6 +10,7 @@ class Team(models.Model):
     city = models.CharField(max_length=100)
     founded_year = models.IntegerField()
     homeground = models.CharField(max_length=100)
+    is_in_premier_league = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
@@ -113,7 +114,7 @@ class Team(models.Model):
 
 class Player(models.Model):
     name = models.CharField(max_length=100)
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.PROTECT)
     position = models.CharField(max_length=50)
     age = models.IntegerField()
 
@@ -124,14 +125,28 @@ class Player(models.Model):
         )
 
 class Match(models.Model):
+    ''' Model to represent a football match between two teams. It captures essential 
+    details like date, time, venue, teams involved, scores and match status.
+    This model can be used to display match schedules, results, and also for future 
+    features like match predictions, head-to-head stats, and detailed match reports.'''
+    class MatchStatus(models.TextChoices):
+        '''Using TextChoices to define match status options for better data integrity and readability'''
+        Completed = 'FINISHED', 'Finished'
+        UPCOMING = 'SCHEDULED', 'Scheduled'
+        LIVE = 'IN_PLAY', 'Live'
+
     date = models.DateField()
     time = models.TimeField()
     venue = models.CharField(max_length=255)
-    home_team = models.ForeignKey(Team, related_name='home_matches', on_delete=models.CASCADE)
-    away_team = models.ForeignKey(Team, related_name='away_matches', on_delete=models.CASCADE)
+    home_team = models.ForeignKey(Team, related_name='home_matches', on_delete=models.PROTECT)
+    away_team = models.ForeignKey(Team, related_name='away_matches', on_delete=models.PROTECT)
     home_score = models.PositiveIntegerField(default=0)
     away_score = models.PositiveIntegerField(default=0)
-    match_status = models.TextField() # e.g., Scheduled, Ongoing/Live, Completed.
+    match_status = models.CharField(
+        max_length=20,
+        choices=MatchStatus.choices,
+        default=MatchStatus.Completed
+    )
 
     def __str__(self):
         return (
@@ -139,24 +154,39 @@ class Match(models.Model):
         )
     
 
-class MatchEvents(models.Model):
+class MatchEvent(models.Model):
+    ''' Model to capture key events in a match like goals, assists, cards, substitutions etc.
+    This can be used to show detailed match reports and also for future features like player 
+    stats, top scorers, assist leaders, disciplinary records etc.'''
     class EventType(models.TextChoices):
-        GOAL = 'Goal', 'Goal'
-        ASSIST = 'Assist', 'Assist'
-        YELLOW_CARD = 'Yellow Card', 'Yellow Card'
-        RED_CARD = 'Red Card', 'Red Card'
-        OWN_GOAL = 'Own Goal', 'Own Goal'
+        GOAL = 'GOAL', 'Goal'
+        ASSIST = 'ASSIST', 'Assist'
+        YELLOW_CARD = 'YELLOW', 'Yellow Card'
+        RED_CARD = 'RED', 'Red Card'
+        OWN_GOAL = 'OWN_GOAL', 'Own Goal'
+        SUBSTITUTION = 'SUB', 'Substitution'
+        PENALTY = 'PENALTY', 'Penalty'
 
-    match = models.ForeignKey(Match, on_delete=models.CASCADE)
-    player = models.ForeignKey(Player, on_delete=models.CASCADE)
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='events')
+    player = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='match_events')
+    # Optional: for assists or substitutions
+    related_player = models.ForeignKey(
+        Player, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='related_match_events'
+    )
+    
     event_type = models.CharField(
-        max_length = 50,
-        choices = EventType.choices,
-        default = EventType.GOAL
-        )
-    minute = models.PositiveIntegerField()  # Minute of the match when the event occurred
+        max_length=20,
+        choices=EventType.choices,
+        default=EventType.GOAL
+    )
+    minute = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ['minute'] # Always sort events by time by default
 
     def __str__(self):
-        return (
-            f"Event: {self.event_type} by {self.player.name} in {self.minute} minute of match {self.match}"
-        )
+        return f"{self.get_event_type_display()} - {self.player.name} ({self.minute}')"

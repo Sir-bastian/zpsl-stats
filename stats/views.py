@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from . models import Team, Match
 
@@ -24,3 +24,10 @@ def resultsAndFixtures(request):
     }
 
     return render(request, 'stats/results_and_fixtures.html', context)
+
+def match_detail(request, pk):
+    ''' A view/function that finds and display a match or a 404 ERROR if match doesn't exist'''
+
+    match = get_object_or_404(Match.objects.select_related('home_team', 'away_team'), pk=pk)
+
+    return render(request, 'stats/match_detail.html', {'match': match})

@@ -1,0 +1,69 @@
+{% extends "stats/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    
+    <div class="mb-4">
+        <a href="{% url 'results_and_fixtures' %}" class="text-decoration-none text-muted">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+
+    <div class="card shadow border-0">
+        <div class="card-body text-center py-5">
+            <h6 class="text-muted text-uppercase mb-4">
+                {{ match.date|date:"l, d F Y " }} | {{ match.venue }}
+            </h6>
+
+            <div class="row align-items-center">
+                <div class="col-md-5">
+                    <h2 class="display-5 fw-bold">{{ match.home_team.name }}</h2>
+                </div>
+
+                <div class="col-md-2">
+                    {% if match.match_status == 'Completed' %}
+                        <div class="bg-dark text-white rounded p-3">
+                            <h1 class="display-4 fw-bold mb-0">
+                                {{ match.home_score }} - {{ match.away_score }}
+                            </h1>
+                        </div>
+                        <p class="mt-2 text-success fw-bold">FULLTIME</p>
+                    {% else %}
+                        <div class="border rounded p-3">
+                            <h1 class="display-4 fw-bold text-muted mb-0">VS</h1>
+                        </div>
+                        <p class="mt-2 text-primary fw-bold">KICK OFF: {{ match.time|time:"H:i" }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-5">
+                    <h2 class="display-5 fw-bold">{{ match.away_team.name }}</h2>
+                </div>
+            </div>
+
+            <hr class="my-5">
+
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="text-muted">Competition</td>
+                            <td class="fw-bold">ZPSL 2026</td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Stadium</td>
+                            <td class="fw-bold">{{ match.venue }}</td>
+                        </tr>
+                        {% if match.match_status == 'Completed' %}
+                        <tr>
+                            <td class="text-muted">Match Day</td>
+                            <td class="fw-bold">Round {{ match.date|date:"W" }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
