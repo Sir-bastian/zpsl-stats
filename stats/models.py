@@ -113,10 +113,39 @@ class Team(models.Model):
         return self.stats['form']
 
 class Player(models.Model):
+
+    class Position(models.TextChoices):
+        GOALKEEPER = 'GK', 'Goalkeeper'
+        DEFENDER = 'DEF', 'Defender'
+        MIDFIELDER = 'MID', 'Midfielder'
+        FORWARD = 'FWD', 'Forward'
+
     name = models.CharField(max_length=100)
     team = models.ForeignKey(Team, on_delete=models.PROTECT)
-    position = models.CharField(max_length=50)
-    age = models.IntegerField()
+    position = models.CharField(
+        max_length=5,
+        choices=Position.choices,
+        default=Position.MIDFIELDER
+        )
+    date_of_birth = models.DateField(null=True, blank=True)
+
+    class Meta:
+        # This prevents saving a player with the exact same name AND team twice
+        unique_together = ('name', 'team')
+
+    @property
+    def age(self):
+        ''' A property to calculate the age of the player based on their date of birth.
+        This can be used to show player ages in the player profile and also for future features'''
+        if not self.date_of_birth:
+            return "N/A"
+        
+        today = date.today()
+        age = today.year - self.date_of_birth.year
+        # Adjust if the birthday hasn't happened yet this year
+        birthday_not_passed = (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
+        
+        return age - (1 if birthday_not_passed else 0)
 
     def __str__(self):
         return (
