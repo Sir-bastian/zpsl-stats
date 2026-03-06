@@ -21,7 +21,7 @@ class Team(models.Model):
     def get_stats(self):
         all_matches = Match.objects.filter(
             Q(home_team=self) | Q(away_team=self),
-            match_status='Completed')
+            match_status='FINISHED')
         
         stats = {
             'played': 0,
@@ -174,14 +174,13 @@ class Match(models.Model):
     match_status = models.CharField(
         max_length=20,
         choices=MatchStatus.choices,
-        default=MatchStatus.Completed
+        default=MatchStatus.UPCOMING
     )
 
     def __str__(self):
         return (
             f"Match: {self.home_team.name} vs {self.away_team.name} on {self.date} at {self.time} at {self.venue} - Status: {self.match_status}"
         )
-    
 
 class MatchEvent(models.Model):
     ''' Model to capture key events in a match like goals, assists, cards, substitutions etc.
@@ -197,7 +196,8 @@ class MatchEvent(models.Model):
         PENALTY = 'PENALTY', 'Penalty'
 
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='events')
-    player = models.ForeignKey(Player, on_delete=models.PROTECT, related_name='match_events')
+    player = models.ForeignKey(Player, on_delete=models.SET_NULL, related_name='match_events', null=True, blank=True)
+
     # Optional: for assists or substitutions
     related_player = models.ForeignKey(
         Player, 
