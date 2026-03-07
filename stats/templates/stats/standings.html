@@ -2,8 +2,10 @@
 
 {% block content %}
 <div class="card shadow-sm">
-    <div class="card-header bg-success text-white">
-        <h3 class="mb-0">ZPSL Official Standings - 2026</h3>
+    <div class="card-header zpsl-header py-3">
+        <h3 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 1px; text-align: center;">
+            <span style="color: red;">Castle Lager</span> Premier Soccer League - 2026
+        </h3>
     </div>
     <div class="card-body p-0">
         <table class="table table-hover mb-0">
@@ -19,7 +21,7 @@
                     <th>GA</th>
                     <th>GD</th>
                     <th>Pts</th>
-                    <th>Win %</th>
+                    <!-- th>Win %</th> -->
                     <th>Form</th>
                 </tr>
             </thead>
@@ -37,9 +39,9 @@
                         <td>{{ s.goals_against }}</td>
                         <td>{{ s.goal_difference }}</td>
                         <td class="text-primary"><strong>{{ s.points }}</strong></td>
-                        <td>
+                        <!-- <td>
                             <small class="text-muted">{{ s.win_percentage|floatformat:1 }}%</small>
-                        </td>
+                        </td> -->
                         <td>
                             {% for result in s.form %}
                                 {% if result == 'W' %}

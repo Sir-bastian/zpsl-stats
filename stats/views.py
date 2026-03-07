@@ -16,7 +16,7 @@ def resultsAndFixtures(request):
     ''' A view that dsiplay the recent and past match results'''
 
     results = Match.objects.filter(match_status='FINISHED').select_related('home_team', 'away_team').order_by('-date')[:10]
-    fixtures = Match.objects.filter(match_status='UPCOMING').select_related('home_team', 'away_team').order_by('date')[:10]
+    fixtures = Match.objects.filter(match_status='SCHEDULED').select_related('home_team', 'away_team').order_by('date')[:10]
 
     context = {
         'results': results,

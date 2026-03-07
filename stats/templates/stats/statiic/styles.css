@@ -1,0 +1,14 @@
+/* ZPSL Castle Lager Theme */
+:root {
+    --castle-red: #d40000;    /* The bold label red */
+    --castle-gold: #f1b434;   /* The liquid gold */
+    --castle-black: #1a1a1a;  /* Contrast */
+    --castle-cream: #f9f9f9;  /* Background soft tint */
+}
+
+/* Sleek ZPSL Header TITLE SECTION */
+.zpsl-header {
+    background-color: var(--castle-black);
+    color: var(--castle-gold);
+    border-bottom: 3px solid var(--castle-gold);
+}
