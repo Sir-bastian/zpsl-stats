@@ -9,6 +9,7 @@ class MatchEventInline(admin.TabularInline):
 
     fields = ('event_type', 'minute', 'player', 'related_player')
     raw_id_fields = ('player', 'related_player')
+    can_delete = True
 
 
 class MatchAdmin(admin.ModelAdmin):
