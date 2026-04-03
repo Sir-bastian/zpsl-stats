@@ -10,6 +10,7 @@ class Team(models.Model):
     city = models.CharField(max_length=100)
     founded_year = models.IntegerField()
     homeground = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to='team_logos/', null=True, blank=True)
     is_in_premier_league = models.BooleanField(default=True)
 
     def __str__(self):
