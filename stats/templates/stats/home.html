@@ -18,14 +18,14 @@
             <div class="card border-0 shadow-sm mb-2 rounded-4">
                 <div class="card-body d-flex align-items-center justify-content-between py-3">
                     <div class="text-center" style="width: 35%;">
-                        <img src="{% static 'images/logos/' %}{{ match.home_team.logo_filename }}" width="30" class="mb-1 d-block mx-auto">
+                        <img src="{% static 'images/logos/' %}{{ match.home_team.logo }}" width="30" class="mb-1 d-block mx-auto">
                         <span class="fw-bold small d-block text-truncate">{{ match.home_team.name }}</span>
                     </div>
                     <div class="bg-dark text-white rounded-3 px-3 py-1 fw-bold h5 mb-0">
                         {{ match.home_score }} - {{ match.away_score }}
                     </div>
                     <div class="text-center" style="width: 35%;">
-                        <img src="{% static 'images/logos/' %}{{ match.away_team.logo_filename }}" width="30" class="mb-1 d-block mx-auto">
+                        <img src="{% static 'images/logos/' %}{{ match.away_team.logo }}" width="30" class="mb-1 d-block mx-auto">
                         <span class="fw-bold small d-block text-truncate">{{ match.away_team.name }}</span>
                     </div>
                 </div>
@@ -73,7 +73,16 @@
                             {% for team in standings %}
                             <tr class="small">
                                 <td class="ps-3">{{ forloop.counter }}</td>
-                                <td class="fw-bold">{{ team.name }}</td>
+                                <td class="fw-bold">
+                                    <div class="d-flex align-items-center">
+                                        <!-- 1. The Logo Container -->
+                                        <div class="logo-container me-2">
+                                            <img src="{% static 'stats/images/logos/' %}{{ team.logo }}" alt="team logo" class="team-logo">
+                                        </div>
+                                        <span class="team-name-cell">{{ team.name }}</span>
+                                    </div>
+                                </td>
+
                                 <td>{{ team.played }}</td>
                                 <td class="text-end pe-3"><strong>{{ team.points }}</strong></td>
                             </tr>

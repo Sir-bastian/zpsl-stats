@@ -37,3 +37,23 @@ body {
     color: #000 !important;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+
+/* Logo Container Styles for the Curved Logos and Stuff */
+.logo-container {
+    width: 24px;
+    height: 24px;
+    background-color: #fff;
+    border-radius: 6px; /* This creates the "kind of circular" curved corners */
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.logo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
