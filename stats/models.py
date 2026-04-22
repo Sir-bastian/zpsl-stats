@@ -10,7 +10,7 @@ class Team(models.Model):
     city = models.CharField(max_length=100)
     founded_year = models.IntegerField()
     homeground = models.CharField(max_length=100)
-    logo = models.ImageField(upload_to='team_logos/', null=True, blank=True)
+    logo = models.CharField(max_length=255, null=True, blank=True)
     is_in_premier_league = models.BooleanField(default=True)
 
     def __str__(self):
@@ -129,6 +129,8 @@ class Player(models.Model):
         default=Position.MIDFIELDER
         )
     date_of_birth = models.DateField(null=True, blank=True)
+    goals = models.PositiveIntegerField(default=0)
+    assists = models.PositiveIntegerField(default=0) # For Future Use
 
     class Meta:
         # This prevents saving a player with the exact same name AND team twice
@@ -147,6 +149,20 @@ class Player(models.Model):
         birthday_not_passed = (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
         
         return age - (1 if birthday_not_passed else 0)
+    
+    @property
+    def goals(self):
+        # Counts events where this player was the scorer
+        # We include GOAL and PENALTY
+        return self.match_events.filter(
+            event_type__in=[MatchEvent.EventType.GOAL, MatchEvent.EventType.PENALTY]
+        ).count()
+
+    @property
+    def assists(self):
+        # In a goal event, the 'related_player' is often the one who gave the assist
+        # Or if you record an 'ASSIST' event type specifically:
+        return self.match_events.filter(event_type=MatchEvent.EventType.ASSIST).count()
 
     def __str__(self):
         return (
@@ -213,10 +229,11 @@ class MatchEvent(models.Model):
         choices=EventType.choices,
         default=EventType.GOAL
     )
-    minute = models.PositiveIntegerField()
+    minute = models.PositiveIntegerField(null=True, blank=True)  # Minute of the match when the event occurred
 
     class Meta:
         ordering = ['minute'] # Always sort events by time by default
 
     def __str__(self):
-        return f"{self.get_event_type_display()} - {self.player.name} ({self.minute}')"
+        player_name = self.player.name if self.player else "Unknown Player"
+        return f"{self.get_event_type_display()} - {player_name} ({self.minute}')"

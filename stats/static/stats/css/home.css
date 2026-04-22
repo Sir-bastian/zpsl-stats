@@ -1,0 +1,39 @@
+body {
+    background-color: #f4f7f6; /* Soft gray makes the white cards pop */
+}
+
+.card {
+    transition: transform 0.2s ease;
+}
+
+/* On mobile, remove some padding to save space */
+@media (max-width: 576px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .h5 { font-size: 1.1rem; }
+}
+
+/* Custom styles for the STATS tabbed interface */
+/* Ensure inactive tabs are hidden */
+.tab-content > .tab-pane {
+    display: none;
+}
+/* Ensure active tab is visible */
+.tab-content > .active {
+    display: block !important;
+}
+
+/* Style the buttons to look like a modern app switcher */
+#leaderboardTabs .nav-link {
+    border: none;
+    color: #6c757d;
+    transition: all 0.2s ease;
+}
+
+#leaderboardTabs .nav-link.active {
+    background-color: #ffffff !important; /* White button on gray background */
+    color: #000 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
