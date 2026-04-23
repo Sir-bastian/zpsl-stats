@@ -1,6 +1,7 @@
 from datetime import timezone
 from django.shortcuts import render, get_object_or_404
 from . models import Team, Match, Player
+from django.db.models import Count, Q 
 
 # Create your views here.
 def index(request):
@@ -10,9 +11,13 @@ def index(request):
     recent_results = Match.objects.filter(match_status='FINISHED').select_related('home_team', 'away_team').order_by('-date')[:5]
     upcoming_fixtures = Match.objects.filter(match_status='SCHEDULED').select_related('home_team', 'away_team').order_by('date')[:5]
 
-    all_players = Player.objects.all()
-    top_scorers = sorted(all_players, key=lambda p: p.goals, reverse=True)[:5]
-    top_assists = sorted(all_players, key=lambda p: p.assists, reverse=True)[:5]
+    top_scorers = Player.objects.annotate(goals_count=Count(
+        'match_events', filter=Q(match_events__event_type='GOAL')
+    )).order_by('-goals_count')[:5]
+
+    top_assists = Player.objects.annotate(assists_count=Count(
+        'match_events', filter=Q(match_events__event_type='ASSIST')
+    )).order_by('-assists_count')[:5]
 
     # Clean Sheets Logic
     clean_sheets = sorted(all_teams, key=lambda t: getattr(t, 'clean_sheets', 0), reverse=True)[:5]
@@ -27,10 +32,12 @@ def index(request):
     })
 
 def standings(request):
-    teams = Team.objects.all()
-    sorted_teams = sorted(teams, key=lambda t: (t.points, t.goal_difference), reverse=True)
-
-    return render(request, 'stats/standings.html', {'teams': sorted_teams})
+    teams = Team.objects.filter(is_in_premier_league=True).order_by(
+        '-points', 
+        '-goal_difference', 
+        '-goals_for'
+    )
+    return render(request, 'stats/standings.html', {'teams': teams})
 
 def resultsAndFixtures(request):
     ''' A view that dsiplay the recent and past match results'''

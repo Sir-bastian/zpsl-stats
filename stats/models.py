@@ -12,6 +12,15 @@ class Team(models.Model):
     homeground = models.CharField(max_length=100)
     logo = models.CharField(max_length=255, null=True, blank=True)
     is_in_premier_league = models.BooleanField(default=True)
+    # actual fields for points, wins, etc., so the database doesn't have to calculate them on the fly.
+    points = models.IntegerField(default=0)
+    played = models.IntegerField(default=0)
+    wins = models.IntegerField(default=0)
+    draws = models.IntegerField(default=0)
+    losses = models.IntegerField(default=0)
+    goals_for = models.IntegerField(default=0)
+    goals_against = models.IntegerField(default=0)
+    goal_difference = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -96,14 +105,6 @@ class Team(models.Model):
         you ask for a stat, then remembers it for the rest of the page load.
         """
         return self.get_stats()
-    
-    @property
-    def points(self):
-        return self.stats['points']
-
-    @property
-    def goal_difference(self):
-        return self.stats['goal_difference']
 
     @property
     def win_percentage(self):

@@ -1,0 +1,24 @@
+/* Container must have overflow-x: auto */
+.table-responsive {
+    position: relative;
+}
+
+/* The Team Column */
+.sticky-col {
+    position: sticky;
+    left: 0;
+    background-color: white; /* Matches row background */
+    z-index: 1;
+    border-right: 1px solid #dee2e6; /* Adds a nice divider when scrolling */
+}
+
+/* Ensure header stays dark and sticky too */
+thead th.sticky-col {
+    background-color: #212529 !important; /* Matches table-dark */
+    z-index: 2;
+}
+
+/* Adjust for hover effects */
+.table-hover tbody tr:hover .sticky-col {
+    background-color: #f8f9fa; /* Matches Bootstrap hover color */
+}

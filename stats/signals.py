@@ -2,6 +2,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from .models import MatchEvent, Match
 from django.db.models import Q
+from .services import update_team_standings
 
 @receiver([post_save, post_delete], sender=MatchEvent)
 def update_match_score(sender, instance, **kwargs):
@@ -30,4 +31,14 @@ def update_match_score(sender, instance, **kwargs):
     # Update the match fields and save
     match.home_score = home_goals
     match.away_score = away_goals
-    match.save()
+    match.save(update_fields=['home_score', 'away_score'])  # This will trigger the post_save signal for Match, which will update standings
+
+@receiver(post_save, sender=Match)
+def update_standings_on_match_save(sender, instance, **kwargs):
+    """
+    Automatically triggers a standings refresh for both teams 
+    whenever a match is saved as 'FINISHED'.
+    """
+    if instance.match_status == 'FINISHED':
+        update_team_standings(instance.home_team)
+        update_team_standings(instance.away_team)

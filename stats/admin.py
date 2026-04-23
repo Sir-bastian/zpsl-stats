@@ -18,8 +18,19 @@ class MatchAdmin(admin.ModelAdmin):
 
     readonly_fields = ('home_score', 'away_score')  # Scores should be updated via MatchEvent, not directly
 
+
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    # These fields can be seen but not edited in the Admin form
+    readonly_fields = ('points', 'played', 'wins', 'draws', 'losses', 'goals_for', 'goals_against', 'goal_difference')
+    
+    # Optional: organize the admin view so stats are at the bottom
+    fieldsets = (
+        ('Basic Info', {'fields': ('name', 'city', 'logo', 'is_in_premier_league')}),
+        ('Auto-Calculated Stats', {'fields': readonly_fields}),
+    )
+
 # Register your models here.
-admin.site.register(Team)
 admin.site.register(Player)
 admin.site.register(Match, MatchAdmin) 
 admin.site.register(MatchEvent)

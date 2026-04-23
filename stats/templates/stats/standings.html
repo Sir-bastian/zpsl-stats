@@ -1,4 +1,9 @@
 {% extends "stats/base.html" %}
+{% load static%}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'stats/css/standings.css' %}">
+{% endblock %}
 
 {% block content %}
 <div class="card shadow-sm">
@@ -8,42 +13,39 @@
         </h3>
     </div>
     <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-            <thead class="table-dark">
-                <tr>
-                    <th>Rank</th>
-                    <th>Team</th>
-                    <th>P</th>
-                    <th>W</th>
-                    <th>D</th>
-                    <th>L</th>
-                    <th>GF</th>
-                    <th>GA</th>
-                    <th>GD</th>
-                    <th>Pts</th>
-                    <!-- th>Win %</th> -->
-                    <th>Form</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for team in teams %}
-                    {% with s=team.get_stats %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th class="sticky-col">Team</th> <!-- We will define sticky-col below -->
+                        <th>P</th>
+                        <th class="d-none d-md-table-cell">W</th>
+                        <th class="d-none d-md-table-cell">D</th>
+                        <th class="d-none d-md-table-cell">L</th>
+                        <th class="d-none d-md-table-cell">GF</th>
+                        <th class="d-none d-md-table-cell">GA</th>
+                        <th class="d-none d-lg-table-cell">GD</th> <!-- Hide GD even longer -->
+                        <th>Pts</th>
+                        <th>Form</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for team in teams %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
                         <td class="fw-bold">{{ team.name }}</td>
-                        <td>{{ s.played }}</td>
-                        <td>{{ s.wins }}</td>
-                        <td>{{ s.draws }}</td>
-                        <td>{{ s.losses }}</td>
-                        <td>{{ s.goals_for }}</td>
-                        <td>{{ s.goals_against }}</td>
-                        <td>{{ s.goal_difference }}</td>
-                        <td class="text-primary"><strong>{{ s.points }}</strong></td>
-                        <!-- <td>
-                            <small class="text-muted">{{ s.win_percentage|floatformat:1 }}%</small>
-                        </td> -->
+                        <td>{{ team.played }}</td>
+                        <td>{{ team.wins }}</td>
+                        <td>{{ team.draws }}</td>
+                        <td>{{ team.losses }}</td>
+                        <td>{{ team.goals_for }}</td>
+                        <td>{{ team.goals_against }}</td>
+                        <td>{{ team.goal_difference }}</td>
+                        <td class="text-primary"><strong>{{ team.points }}</strong></td>
                         <td>
-                            {% for result in s.form %}
+                            {% for result in team.form %}
                                 {% if result == 'W' %}
                                     <span class="badge bg-success" style="width: 24px;">W</span>
                                 {% elif result == 'D' %}
@@ -54,14 +56,11 @@
                             {% endfor %}
                         </td>
                     </tr>
-                    {% endwith %}
-                {% empty %}
-                    <tr>
-                        <td colspan="9" class="text-center">No teams found in the league.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}
