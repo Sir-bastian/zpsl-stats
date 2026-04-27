@@ -1,7 +1,7 @@
 from datetime import timezone
 from django.shortcuts import render, get_object_or_404
 from . models import Team, Match, Player
-from django.db.models import Count, Q 
+from django.db.models import Q
 
 # Create your views here.
 def index(request):
@@ -11,13 +11,8 @@ def index(request):
     recent_results = Match.objects.filter(match_status='FINISHED').select_related('home_team', 'away_team').order_by('-date')[:5]
     upcoming_fixtures = Match.objects.filter(match_status='SCHEDULED').select_related('home_team', 'away_team').order_by('date')[:5]
 
-    top_scorers = Player.objects.annotate(goals_count=Count(
-        'match_events', filter=Q(match_events__event_type='GOAL')
-    )).order_by('-goals_count')[:5]
-
-    top_assists = Player.objects.annotate(assists_count=Count(
-        'match_events', filter=Q(match_events__event_type='ASSIST')
-    )).order_by('-assists_count')[:5]
+    top_scorers = Player.get_top_scorers()[:10]
+    top_assists = Player.get_top_assists()[:10]
 
     # Clean Sheets Logic
     clean_sheets = sorted(all_teams, key=lambda t: getattr(t, 'clean_sheets', 0), reverse=True)[:5]
@@ -33,6 +28,7 @@ def index(request):
 
 def standings(request):
     teams = Team.objects.filter(is_in_premier_league=True).order_by(
+        '-played'
         '-points', 
         '-goal_difference', 
         '-goals_for'
@@ -52,9 +48,22 @@ def resultsAndFixtures(request):
 
     return render(request, 'stats/results_and_fixtures.html', context)
 
-def match_detail(request, pk):
+def match_detail(request, match_id):
     ''' A view/function that finds and display a match or a 404 ERROR if match doesn't exist'''
+    # We fetch the match and "prefetch" events to avoid the N+1 query problem when we later access match.match_events in the template.
+    match = get_object_or_404(
+        Match.objects.select_related('home_team', 'away_team').prefetch_related('events__player'),
+        id=match_id
+    )
 
-    match = get_object_or_404(Match.objects.select_related('home_team', 'away_team'), pk=pk)
+    # Seperate Events by team for the template
+    home_events = match.events.filter(player__team=match.home_team).order_by('minute')
+    away_events = match.events.filter(player__team=match.away_team).order_by('minute')
 
-    return render(request, 'stats/match_detail.html', {'match': match})
+    context = {
+        'match': match,
+        'home_events': home_events,
+        'away_events': away_events
+    }
+
+    return render(request, 'stats/match_detail.html', context)

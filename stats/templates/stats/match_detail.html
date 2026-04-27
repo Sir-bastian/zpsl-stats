@@ -1,66 +1,52 @@
 {% extends "stats/base.html" %}
+{% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    
-    <div class="mb-4">
-        <a href="{% url 'results_and_fixtures' %}" class="text-decoration-none text-muted">
-            <i class="bi bi-arrow-left"></i> Back
-        </a>
-    </div>
-
-    <div class="card shadow border-0">
-        <div class="card-body text-center py-5">
-            <h6 class="text-muted text-uppercase mb-4">
-                {{ match.date|date:"l, d F Y " }} | {{ match.venue }}
-            </h6>
-
-            <div class="row align-items-center">
-                <div class="col-md-5">
-                    <h2 class="display-5 fw-bold">{{ match.home_team.name }}</h2>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0 mb-4 overflow-hidden" style="background-color: #f8f9fa;">
+        <div class="card-body py-4">
+            <div class="row align-items-center text-center">
+                <div class="col-4">
+                    <div class="mx-auto bg-white p-2 rounded-circle mb-2" style="width: 60px; height: 60px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <img src="{% static 'stats/images/team_logos/' %}{{ match.home_team.logo }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+                    <h6 class="fw-bold mb-0 text-dark">{{ match.home_team.name }}</h6>
+                </div>
+                
+                <div class="col-4 px-0">
+                    <h2 class="fw-bold mb-0 text-dark">{{ match.home_score }} - {{ match.away_score }}</h2>
+                    <span class="badge bg-light text-danger border border-danger small">{{ match.get_match_status_display }}</span>
+                    <div class="text-center mb-3">
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-calendar-event"></i> {{ match.date|date:"d M Y" }} 
+                            &nbsp;•&nbsp; 
+                            <i class="bi bi-clock"></i> {{ match.kickoff_time|time:"H:i" }}
+                            &nbsp;•&nbsp; 
+                            <i class="bi bi-geo-alt"></i> {{ match.venue }}
+                        </p>
+                    </div>
                 </div>
 
-                <div class="col-md-2">
-                    {% if match.match_status == 'Completed' %}
-                        <div class="bg-dark text-white rounded p-3">
-                            <h1 class="display-4 fw-bold mb-0">
-                                {{ match.home_score }} - {{ match.away_score }}
-                            </h1>
-                        </div>
-                        <p class="mt-2 text-success fw-bold">FULLTIME</p>
-                    {% else %}
-                        <div class="border rounded p-3">
-                            <h1 class="display-4 fw-bold text-muted mb-0">VS</h1>
-                        </div>
-                        <p class="mt-2 text-primary fw-bold">KICK OFF: {{ match.time|time:"H:i" }}</p>
-                    {% endif %}
-                </div>
-
-                <div class="col-md-5">
-                    <h2 class="display-5 fw-bold">{{ match.away_team.name }}</h2>
+                <div class="col-4">
+                    <div class="mx-auto bg-white p-2 rounded-circle mb-2" style="width: 60px; height: 60px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                        <img src="{% static 'stats/images/team_logos/' %}{{ match.away_team.logo }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+                    <h6 class="fw-bold mb-0 text-dark">{{ match.away_team.name }}</h6>
                 </div>
             </div>
+        </div>
 
-            <hr class="my-5">
-
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <table class="table table-borderless">
-                        <tr>
-                            <td class="text-muted">Competition</td>
-                            <td class="fw-bold">ZPSL 2026</td>
-                        </tr>
-                        <tr>
-                            <td class="text-muted">Stadium</td>
-                            <td class="fw-bold">{{ match.venue }}</td>
-                        </tr>
-                        {% if match.match_status == 'Completed' %}
-                        <tr>
-                            <td class="text-muted">Match Day</td>
-                            <td class="fw-bold">Round {{ match.date|date:"W" }}</td>
-                        </tr>
-                        {% endif %}
-                    </table>
+        <div class="card-footer bg-white border-0 py-3">
+            <div class="d-flex justify-content-between px-2">
+                <div class="w-50 text-end pe-3 border-end">
+                    {% for event in home_events %}
+                        <div class="small mb-1"><span class="fw-bold">{{ event.player.name }}</span> <span class="text-muted">{{ event.minute }}'</span> {% if event.event_type == 'GOAL' %}⚽{% endif %}</div>
+                    {% endfor %}
+                </div>
+                <div class="w-50 text-start ps-3">
+                    {% for event in away_events %}
+                        <div class="small mb-1">{% if event.event_type == 'GOAL' %}⚽{% endif %} <span class="text-muted">{{ event.minute }}'</span> <span class="fw-bold">{{ event.player.name }}</span></div>
+                    {% endfor %}
                 </div>
             </div>
         </div>

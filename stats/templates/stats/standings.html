@@ -1,41 +1,51 @@
 {% extends "stats/base.html" %}
-{% load static%}
+{% load static %}
 
 {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'stats/css/standings.css' %}">
+    <link rel="stylesheet" href="{% static 'stats/css/standings.css' %}?v=1.1">
 {% endblock %}
 
 {% block content %}
-<div class="card shadow-sm">
-    <div class="card-header zpsl-header py-3">
+<div class="card shadow-sm border-0">
+    <div class="card-header zpsl-header py-3 bg-white">
         <h3 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 1px; text-align: center;">
             <span style="color: red;">Castle Lager</span> Premier Soccer League - 2026
         </h3>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover">
                 <thead class="table-dark">
                     <tr>
-                        <th>#</th>
-                        <th class="sticky-col">Team</th> <!-- We will define sticky-col below -->
+                        <th class="sticky-col" style="left: 0;">#</th>
+                        <th class="sticky-col" style="left: 40px;">Club</th> <!-- Offset by Rank width -->
                         <th>P</th>
-                        <th class="d-none d-md-table-cell">W</th>
-                        <th class="d-none d-md-table-cell">D</th>
-                        <th class="d-none d-md-table-cell">L</th>
-                        <th class="d-none d-md-table-cell">GF</th>
-                        <th class="d-none d-md-table-cell">GA</th>
-                        <th class="d-none d-lg-table-cell">GD</th> <!-- Hide GD even longer -->
+                        <th>W</th>
+                        <th>D</th>
+                        <th>L</th>
+                        <th>GF</th>
+                        <th>GA</th>
+                        <th>GD</th>
                         <th>Pts</th>
                         <th>Form</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {% for team in teams %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td class="fw-bold">{{ team.name }}</td>
+                        <td class="sticky-col" style="left: 0;">{{ forloop.counter }}.</td>
+                        <td class="sticky-col fw-bold" style="left: 40px;">
+                            <div class="d-flex align-items-center">
+                                <div class="logo-container me-2">
+                                    {% if team.logo %}
+                                        <img src="{% static 'stats/images/team_logos/' %}{{ team.logo }}" alt="logo" class="team-logo">
+                                    {% else %}
+                                        <div class="bg-light rounded-circle" style="width:32px; height:32px;"></div>
+                                    {% endif %}
+                                </div>
+                                <span class="team-name-cell">{{ team.name }}</span>
+                            </div>
+                        </td>
                         <td>{{ team.played }}</td>
                         <td>{{ team.wins }}</td>
                         <td>{{ team.draws }}</td>
@@ -43,22 +53,15 @@
                         <td>{{ team.goals_for }}</td>
                         <td>{{ team.goals_against }}</td>
                         <td>{{ team.goal_difference }}</td>
-                        <td class="text-primary"><strong>{{ team.points }}</strong></td>
+                        <td class="text-primary fw-bold">{{ team.points }}</td>
                         <td>
                             {% for result in team.form %}
-                                {% if result == 'W' %}
-                                    <span class="badge bg-success" style="width: 24px;">W</span>
-                                {% elif result == 'D' %}
-                                    <span class="badge bg-secondary" style="width: 24px;">D</span>
-                                {% else %}
-                                    <span class="badge bg-danger" style="width: 24px;">L</span>
-                                {% endif %}
+                                <span class="badge {% if result == 'W' %}bg-success{% elif result == 'D' %}bg-secondary{% else %}bg-danger{% endif %}" style="width: 24px;">{{ result }}</span>
                             {% endfor %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
-
             </table>
         </div>
     </div>

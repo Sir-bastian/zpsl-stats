@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.utils.functional import cached_property
 
 # Create your models here.
@@ -115,7 +115,6 @@ class Team(models.Model):
         return self.stats['form']
 
 class Player(models.Model):
-
     class Position(models.TextChoices):
         GOALKEEPER = 'GK', 'Goalkeeper'
         DEFENDER = 'DEF', 'Defender'
@@ -130,9 +129,7 @@ class Player(models.Model):
         default=Position.MIDFIELDER
         )
     date_of_birth = models.DateField(null=True, blank=True)
-    goals = models.PositiveIntegerField(default=0)
     assists = models.PositiveIntegerField(default=0) # For Future Use
-
     class Meta:
         # This prevents saving a player with the exact same name AND team twice
         unique_together = ('name', 'team')
@@ -164,6 +161,26 @@ class Player(models.Model):
         # In a goal event, the 'related_player' is often the one who gave the assist
         # Or if you record an 'ASSIST' event type specifically:
         return self.match_events.filter(event_type=MatchEvent.EventType.ASSIST).count()
+    
+    @staticmethod
+    def get_top_scorers(limit=10):
+        # Get players annotated with their goal counts, then order by that count
+        return Player.objects.annotate(
+            goals_count=Count(
+                'match_events', 
+                filter=Q(match_events__event_type__in=[MatchEvent.EventType.GOAL, MatchEvent.EventType.PENALTY])
+            )
+        ).order_by('-goals_count')[:limit]
+
+    @staticmethod
+    def get_top_assists(limit=10):
+        # Get players annotated with their assist counts, then order by that count
+        return Player.objects.annotate(
+            assists_count=Count(
+                'match_events', 
+                filter=Q(match_events__event_type=MatchEvent.EventType.ASSIST)
+            )
+        ).order_by('-assists_count')[:limit]
 
     def __str__(self):
         return (

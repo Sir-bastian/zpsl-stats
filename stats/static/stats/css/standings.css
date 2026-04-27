@@ -1,24 +1,54 @@
-/* Container must have overflow-x: auto */
+/* Container to allow horizontal scrolling */
 .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
     position: relative;
 }
 
-/* The Team Column */
+/* Force the table to be wide enough so no stats are crushed */
+.table {
+    min-width: 850px; /* Adjust this until all columns fit comfortably */
+    table-layout: auto;
+    margin-bottom: 0;
+}
+
+/* Fix the "Tall Logo" issue */
+.logo-container {
+    width: 32px;
+    height: 32px; /* Fixed height stops the row from stretching */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.team-logo {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain; /* Prevents distortion; fits image inside the 32x32 box */
+}
+
+/* Sticky Column: Pins Rank & Team while you scroll the other stats */
 .sticky-col {
     position: sticky;
     left: 0;
-    background-color: white; /* Matches row background */
-    z-index: 1;
-    border-right: 1px solid #dee2e6; /* Adds a nice divider when scrolling */
+    background-color: white !important;
+    z-index: 5;
+    box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
 }
 
-/* Ensure header stays dark and sticky too */
-thead th.sticky-col {
+thead .sticky-col {
     background-color: #212529 !important; /* Matches table-dark */
-    z-index: 2;
+    z-index: 6;
 }
 
-/* Adjust for hover effects */
-.table-hover tbody tr:hover .sticky-col {
-    background-color: #f8f9fa; /* Matches Bootstrap hover color */
+/* Prevent text wrapping */
+th, td {
+    white-space: nowrap;
+    vertical-align: middle !important;
+}
+
+.team-name-cell {
+    font-size: 0.95rem;
 }
