@@ -28,7 +28,6 @@ def index(request):
 
 def standings(request):
     teams = Team.objects.filter(is_in_premier_league=True).order_by(
-        '-played'
         '-points', 
         '-goal_difference', 
         '-goals_for'
