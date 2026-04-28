@@ -1,4 +1,4 @@
-from datetime import timezone
+from django.utils import timezone
 from django.shortcuts import render, get_object_or_404
 from . models import Team, Match, Player
 from django.db.models import Q
@@ -26,12 +26,15 @@ def index(request):
         'clean_sheets': clean_sheets
     })
 
-def standings(request):
-    teams = Team.objects.filter(is_in_premier_league=True).order_by(
+def get_standings_data():
+    return Team.objects.filter(is_in_premier_league=True).order_by(
         '-points', 
         '-goal_difference', 
         '-goals_for'
     )
+
+def standings(request):
+    teams = get_standings_data()
     return render(request, 'stats/standings.html', {'teams': teams})
 
 def resultsAndFixtures(request):
@@ -76,3 +79,59 @@ def match_detail(request, match_id):
     }
 
     return render(request, 'stats/match_detail.html', context)
+
+def team_detail(request, team_id):
+    ''' A view/function that finds and display a team or a 404 ERROR if team doesn't exist'''
+    queryset = Team.objects.prefetch_related('player_set')
+    team = get_object_or_404(queryset, id=team_id)
+
+    # The most recent results
+    recent_results = Match.objects.filter(
+        Q(home_team = team) | Q(away_team=team),
+        match_status = 'FINISHED'
+    ).select_related('home_team', 'away_team').order_by('-date', '-time')[:5]
+
+    # Next Fixture ( The very next ONE fixture, not all upcoming fixtures)
+    next_fixture = Match.objects.filter(
+        Q(home_team=team) | Q(away_team=team),
+        match_status = 'SCHEDULED',
+        date__gte=timezone.now().date()
+    ).select_related('home_team', 'away_team').order_by('date').first()
+
+    # Players
+    players = team.player_set.all().order_by('position')
+
+    all_teams = list(get_standings_data()) # Fetch once, convert to list for indexing
+    
+    # Find rank (1-based)
+    team_rank = next((i + 1 for i, t in enumerate(all_teams) if t.id == team.id), None)
+
+    relative_standings = []
+    start_rank = 1
+
+    if team_rank:
+        idx = team_rank - 1
+        count = len(all_teams)
+        
+        # Calculate window (showing 7 teams total)
+        start = max(0, idx - 3)
+        end = start + 7
+        
+        if end > count:
+            end = count
+            start = max(0, end - 7)
+            
+        relative_standings = all_teams[start:end]
+        start_rank = start + 1
+
+    context = {
+        'team': team,
+        'recent_results': recent_results,
+        'next_fixture': next_fixture,
+        'players': players,
+        'team_rank': team_rank,
+        'relative_standings': relative_standings,
+        'start_rank': start_rank
+    }
+
+    return render(request, 'stats/team_detail.html', context)

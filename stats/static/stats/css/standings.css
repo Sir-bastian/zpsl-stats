@@ -1,60 +1,50 @@
-/* Container to allow horizontal scrolling */
-.table-responsive {
+/* 1. The Wrapper: Remove default card padding on mobile to save space */
+.table-card-body {
+    padding: 0 !important;
+}
+
+.table-container {
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-    position: relative;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
 }
 
-/* Force the table to be wide enough so no stats are crushed */
-.table {
-    min-width: 850px; /* Adjust this until all columns fit comfortably */
-    table-layout: auto;
-    margin-bottom: 0;
-}
-
-/* Fix the "Tall Logo" issue */
-.logo-container {
-    width: 32px;
-    height: 32px; /* Fixed height stops the row from stretching */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.team-logo {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain; /* Prevents distortion; fits image inside the 32x32 box */
-}
-
-/* Sticky Column: Pins Rank & Team while you scroll the other stats */
-.sticky-col {
+/* 2. The Sticky Column: Force width and handle truncation */
+.sticky-team {
     position: sticky;
     left: 0;
-    min-width: 150px;
-    max-width: 150px;
     background-color: white !important;
-    z-index: 5;
+    z-index: 2;
+    /* This forces the name area to stay within half the screen */
+    min-width: 140px; 
+    max-width: 160px;
     box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1);
 }
 
-thead .sticky-col {
-    background-color: #212529 !important; /* Matches table-dark */
-    z-index: 6;
+thead th.sticky-team {
+    z-index: 3;
+    background-color: #212529 !important;
 }
 
-/* Prevent text wrapping */
-th, td {
-    white-space: nowrap;
-    vertical-align: middle !important;
-}
-
-.team-name-cell {
-    font-size: 0.95rem;
-    overflow: hidden;
-    text-overflow: ellipsis; /* Adds "..." to long names */
-    white-space: nowrap;
+/* 3. The Truncation Logic */
+.team-name-link {
     display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* Adds the "..." automatically */
+    max-width: 100%;
+    font-size: 0.9rem;
+}
+
+/* 4. Compact Stats: Shrink horizontal padding so more columns fit */
+.table-compact td, .table-compact th {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 0.85rem;
+}
+
+.team-logo {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0; /* Prevents logo from squishing */
 }

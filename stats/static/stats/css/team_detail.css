@@ -1,0 +1,72 @@
+/* Team Header Hero */
+.team-hero {
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+    color: white;
+    padding: 3rem 1rem;
+    border-radius: 0 0 2rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.team-hero-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+}
+
+/* Stats Cards */
+.stat-box {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    display: block;
+    color: #008751; /* ZPSL Green */
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #666;
+    letter-spacing: 1px;
+}
+
+/* Social Icons */
+.social-link {
+    font-size: 1.5rem;
+    color: white;
+    margin: 0 10px;
+    transition: transform 0.2s;
+    display: inline-block;
+}
+
+.social-link:hover {
+    transform: scale(1.2);
+    color: #FFD700; /* ZPSL Gold */
+}
+
+/* Squad List */
+.player-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.player-row:last-child {
+    border-bottom: none;
+}
+
+.pos-badge {
+    font-size: 0.7rem;
+    width: 35px;
+    display: inline-block;
+    text-align: center;
+    font-weight: bold;
+}

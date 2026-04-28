@@ -12,6 +12,12 @@ class Team(models.Model):
     homeground = models.CharField(max_length=100)
     logo = models.CharField(max_length=255, null=True, blank=True)
     is_in_premier_league = models.BooleanField(default=True)
+
+    # Optional fields for future use like social media handles, website, stadium capacity etc.
+    website = models.URLField(blank=True, null=True)
+    twitter_handle = models.CharField(max_length=50, blank=True, null=True)
+    instagram_handle = models.CharField(max_length=50, blank=True, null=True)
+
     # actual fields for points, wins, etc., so the database doesn't have to calculate them on the fly.
     points = models.IntegerField(default=0)
     played = models.IntegerField(default=0)

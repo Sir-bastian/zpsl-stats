@@ -6,63 +6,48 @@
 {% endblock %}
 
 {% block content %}
-<div class="card shadow-sm border-0">
-    <div class="card-header zpsl-header py-3 bg-white">
-        <h3 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 1px; text-align: center;">
-            <span style="color: red;">Castle Lager</span> Premier Soccer League - 2026
-        </h3>
-    </div>
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th class="sticky-col" style="left: 40px;">Club</th> <!-- Offset by Rank width -->
-                        <th>P</th>
-                        <th>W</th>
-                        <th>D</th>
-                        <th>L</th>
-                        <th>GF</th>
-                        <th>GA</th>
-                        <th>GD</th>
-                        <th>Pts</th>
-                        <th>Form</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for team in teams %}
-                    <tr>
-                        <td class="sticky-col" style="left: 0;">{{ forloop.counter }}.</td>
-                        <td class="sticky-col fw-bold" style="left: 40px;">
-                            <div class="d-flex align-items-center">
-                                <div class="logo-container me-2">
-                                    {% if team.logo %}
-                                        <img src="{% static 'stats/images/team_logos/' %}{{ team.logo }}" alt="logo" class="team-logo">
-                                    {% else %}
-                                        <div class="bg-light rounded-circle" style="width:32px; height:32px;"></div>
-                                    {% endif %}
-                                </div>
-                                <span class="team-name-cell">{{ team.name }}</span>
-                            </div>
-                        </td>
-                        <td>{{ team.played }}</td>
-                        <td>{{ team.wins }}</td>
-                        <td>{{ team.draws }}</td>
-                        <td>{{ team.losses }}</td>
-                        <td>{{ team.goals_for }}</td>
-                        <td>{{ team.goals_against }}</td>
-                        <td>{{ team.goal_difference }}</td>
-                        <td class="text-primary fw-bold">{{ team.points }}</td>
-                        <td>
-                            {% for result in team.form %}
-                                <span class="badge {% if result == 'W' %}bg-success{% elif result == 'D' %}bg-secondary{% else %}bg-danger{% endif %}" style="width: 24px;">{{ result }}</span>
-                            {% endfor %}
-                        </td>
-                    </tr>
+<div class="table-container">
+    <table class="table table-hover align-middle mb-0 table-compact">
+        <thead class="table-dark">
+            <tr>
+                <th class="sticky-team"># CLUB</th>
+                <th class="text-center">P</th>
+                <th class="text-center">W</th>
+                <th class="text-center">D</th>
+                <th class="text-center">L</th>
+                <th class="text-center">GD</th>
+                <th class="text-center">PTS</th>
+                <th class="ps-3">FORM</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for team in teams %}
+            <tr>
+                <td class="sticky-team">
+                    <div class="d-flex align-items-center" style="max-width: 100%;">
+                        <span class="me-1 text-muted fw-bold" style="width: 15px; font-size: 0.75rem;">{{ forloop.counter }}</span>
+                        <img src="{% static 'stats/images/team_logos/' %}{{ team.logo }}" class="team-logo me-2" alt="">
+                        <a href="{% url 'team_detail' team.id %}" class="text-decoration-none text-dark fw-bold team-name-link">
+                            {{ team.name }}
+                        </a>
+                    </div>
+                </td>
+                <td class="text-center">{{ team.played }}</td>
+                <td class="text-center">{{ team.wins }}</td>
+                <td class="text-center">{{ team.draws }}</td>
+                <td class="text-center">{{ team.losses }}</td>
+                <td class="text-center fw-semibold">{{ team.goal_difference }}</td>
+                <td class="text-center fw-bold text-primary">{{ team.points }}</td>
+                <td class="ps-3 text-nowrap">
+                    {% for result in team.form %}
+                        <span class="form-dot {% if result == 'W' %}bg-success{% elif result == 'D' %}bg-secondary{% else %}bg-danger{% endif %}">
+                            {{ result }}
+                        </span>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

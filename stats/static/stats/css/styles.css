@@ -13,31 +13,7 @@
     border-bottom: 3px solid var(--castle-gold);
 }
 
-/* Clean and modern ZPSL FORM GUIDE  */
-/* The container for the 5 dots */
-.form-container {
-    display: flex;
-    gap: 4px;
-}
-
-/* The circle itself */
-.form-dot {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 /* Google's specific colors */
 .form-w { background-color: #2e7d32; } /* Win Green */
 .form-l { background-color: #d32f2f; } /* Loss Red */
 .form-d { background-color: #757575; } /* Draw Grey */
-
-/* The icon inside the circle */
-.form-dot svg {
-    width: 12px;
-    height: 12px;
-    fill: white;
-}
