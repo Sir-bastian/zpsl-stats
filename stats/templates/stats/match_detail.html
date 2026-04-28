@@ -2,54 +2,105 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="card shadow-sm border-0 mb-4 overflow-hidden" style="background-color: #f8f9fa;">
-        <div class="card-body py-4">
+<div class="container py-4">
+    <!-- Match Scoreboard Card -->
+    <div class="card shadow border-0 overflow-hidden mb-4">
+        <div class="card-body bg-light text-black py-5">
             <div class="row align-items-center text-center">
+                <!-- Home Team -->
                 <div class="col-4">
-                    <div class="mx-auto bg-white p-2 rounded-circle mb-2" style="width: 60px; height: 60px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                        <img src="{% static 'stats/images/team_logos/' %}{{ match.home_team.logo }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    </div>
-                    <h6 class="fw-bold mb-0 text-dark">{{ match.home_team.name }}</h6>
+                    {% if match.home_team.logo %}
+                        <img src="{% static 'stats/images/team_logos/' %}{{ match.home_team.logo }}" alt="logo" style="width: 70px;" class="mb-2">
+                    {% endif %}
+                    <h3 class="fw-bold h5 mb-0">{{ match.home_team.name }}</h3>
                 </div>
-                
-                <div class="col-4 px-0">
-                    <h2 class="fw-bold mb-0 text-dark">{{ match.home_score }} - {{ match.away_score }}</h2>
-                    <span class="badge bg-light text-danger border border-danger small">{{ match.get_match_status_display }}</span>
-                    <div class="text-center mb-3">
-                        <p class="text-muted small mb-0">
-                            <i class="bi bi-calendar-event"></i> {{ match.date|date:"d M Y" }} 
-                            &nbsp;•&nbsp; 
-                            <i class="bi bi-clock"></i> {{ match.kickoff_time|time:"H:i" }}
-                            &nbsp;•&nbsp; 
-                            <i class="bi bi-geo-alt"></i> {{ match.venue }}
-                        </p>
+
+                <!-- Score & Status -->
+                <div class="col-4">
+                    <div class="display-4 fw-bold mb-1">
+                        {{ match.home_score }} - {{ match.away_score }}
+                    </div>
+                    <div class="small text-uppercase tracking-wider">
+                        {% if is_live %}
+                            <span class="badge bg-danger pulse">Live</span>
+                        {% elif is_finished %}
+                            <span class="text-muted">Full Time</span>
+                        {% else %}
+                            <span class="text-info">
+                                {{ match.match_status|capfirst }}
+                            </span>
+                        {% endif %}
                     </div>
                 </div>
 
+                <!-- Away Team -->
                 <div class="col-4">
-                    <div class="mx-auto bg-white p-2 rounded-circle mb-2" style="width: 60px; height: 60px; display:flex; align-items:center; justify-content:center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-                        <img src="{% static 'stats/images/team_logos/' %}{{ match.away_team.logo }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-                    </div>
-                    <h6 class="fw-bold mb-0 text-dark">{{ match.away_team.name }}</h6>
+                    {% if match.away_team.logo %}
+                        <img src="{% static 'stats/images/team_logos/' %}{{ match.away_team.logo }}" alt="logo" style="width: 70px;" class="mb-2">
+                    {% endif %}
+                    <h3 class="fw-bold h5 mb-0">{{ match.away_team.name }}</h3>
                 </div>
             </div>
         </div>
 
-        <div class="card-footer bg-white border-0 py-3">
-            <div class="d-flex justify-content-between px-2">
-                <div class="w-50 text-end pe-3 border-end">
+        <!-- Match Info Bar -->
+        <div class="bg-light border-bottom py-2 px-3 small text-center text-muted">
+            <i class="bi bi-calendar-event"></i> {{ match.date }} &nbsp;|&nbsp; 
+            <i class="bi bi-clock"></i> {{ match.time }} &nbsp;|&nbsp; 
+            <i class="bi bi-geo-alt"></i> {{ match.venue }}
+        </div>
+
+        <!-- Events List -->
+        <div class="card-footer bg-white p-0">
+            <div class="row g-0">
+                <!-- Home Events -->
+                <div class="col-6 border-end p-3 text-end">
                     {% for event in home_events %}
-                        <div class="small mb-1"><span class="fw-bold">{{ event.player.name }}</span> <span class="text-muted">{{ event.minute }}'</span> {% if event.event_type == 'GOAL' %}⚽{% endif %}</div>
+                        <div class="mb-2">
+                            <span class="fw-bold">{{ event.player.name }}</span>
+                            <small class="text-muted">{{ event.minute }}'</small>
+                            <span class="ms-1">
+                                {% if event.event_type == 'GOAL' %}⚽
+                                {% elif event.event_type == 'PENALTY' %}🥅
+                                {% elif event.event_type == 'YELLOW' %}🟨
+                                {% elif event.event_type == 'RED' %}🟥
+                                {% elif event.event_type == 'OWN_GOAL' %}🔄
+                                {% endif %}
+                            </span>
+                        </div>
+                    {% empty %}
+                        {% if is_finished or is_live %}<small class="text-muted"></small>{% endif %}
                     {% endfor %}
                 </div>
-                <div class="w-50 text-start ps-3">
+
+                <!-- Away Events -->
+                <div class="col-6 p-3 text-start">
                     {% for event in away_events %}
-                        <div class="small mb-1">{% if event.event_type == 'GOAL' %}⚽{% endif %} <span class="text-muted">{{ event.minute }}'</span> <span class="fw-bold">{{ event.player.name }}</span></div>
+                        <div class="mb-2">
+                            <span class="me-1">
+                                {% if event.event_type == 'GOAL' %}⚽
+                                {% elif event.event_type == 'PENALTY' %}🥅
+                                {% elif event.event_type == 'YELLOW' %}🟨
+                                {% elif event.event_type == 'RED' %}🟥
+                                {% elif event.event_type == 'OWN_GOAL' %}🔄
+                                {% endif %}
+                            </span>
+                            <span class="fw-bold">{{ event.player.name }}</span>
+                            <small class="text-muted">{{ event.minute }}'</small>
+                        </div>
+                    {% empty %}
+                        {% if is_finished or is_live %}<small class="text-muted"></small>{% endif %}
                     {% endfor %}
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Return Link -->
+    <div class="text-center">
+        <a href="{% url 'standings' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-arrow-left"></i> Back to Standings
+        </a>
     </div>
 </div>
 {% endblock %}

@@ -197,7 +197,7 @@ class Match(models.Model):
         '''Using TextChoices to define match status options for better data integrity and readability'''
         Completed = 'FINISHED', 'Finished'
         UPCOMING = 'SCHEDULED', 'Scheduled'
-        LIVE = 'IN_PLAY', 'Live'
+        LIVE = 'LIVE', 'LIVE'
 
     date = models.DateField()
     time = models.TimeField()

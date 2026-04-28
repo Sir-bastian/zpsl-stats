@@ -28,7 +28,6 @@ def index(request):
 
 def standings(request):
     teams = Team.objects.filter(is_in_premier_league=True).order_by(
-        '-played'
         '-points', 
         '-goal_difference', 
         '-goals_for'
@@ -52,18 +51,28 @@ def match_detail(request, match_id):
     ''' A view/function that finds and display a match or a 404 ERROR if match doesn't exist'''
     # We fetch the match and "prefetch" events to avoid the N+1 query problem when we later access match.match_events in the template.
     match = get_object_or_404(
-        Match.objects.select_related('home_team', 'away_team').prefetch_related('events__player'),
+        Match.objects.select_related('home_team', 'away_team')
+                     .prefetch_related('events__player'),
         id=match_id
     )
 
-    # Seperate Events by team for the template
-    home_events = match.events.filter(player__team=match.home_team).order_by('minute')
-    away_events = match.events.filter(player__team=match.away_team).order_by('minute')
+    # Initialize variables to avoid UnboundLocalError
+    home_events, away_events = [], []
+    
+    # Use the object status, not new queries
+    is_active = match.match_status in [Match.MatchStatus.Completed, Match.MatchStatus.LIVE]
+    
+    if is_active:
+        # Filtering in Python is faster since you already prefetched the events
+        home_events = [e for e in match.events.all() if e.player.team == match.home_team]
+        away_events = [e for e in match.events.all() if e.player.team == match.away_team]
 
     context = {
         'match': match,
         'home_events': home_events,
-        'away_events': away_events
+        'away_events': away_events,
+        'is_finished': (match.match_status == Match.MatchStatus.Completed),
+        'is_live': (match.match_status == Match.MatchStatus.LIVE),
     }
 
     return render(request, 'stats/match_detail.html', context)
