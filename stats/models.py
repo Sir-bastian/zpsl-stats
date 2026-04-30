@@ -260,4 +260,4 @@ class MatchEvent(models.Model):
 
     def __str__(self):
         player_name = self.player.name if self.player else "Unknown Player"
-        return f"{self.get_event_type_display()} - {player_name} ({self.minute}')"
+        return f"{self.get_event_type_display()} - {player_name} ({self.minute}') (self.match)"
