@@ -45,8 +45,3 @@ from .services import update_team_standings
 def recalculate_stats(modeladmin, request, queryset):
     for team in queryset:
         update_team_standings(team)
-
-@admin.register(Team)
-class TeamAdmin(admin.ModelAdmin):
-    list_display = ('name', 'played', 'points')
-    actions = [recalculate_stats] # This adds a dropdown option
