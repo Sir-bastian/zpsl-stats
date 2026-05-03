@@ -29,7 +29,7 @@ class TeamAdmin(admin.ModelAdmin):
         ('Basic Info', {'fields': ('name', 'city', 'logo', 'is_in_premier_league')}),
         ('Auto-Calculated Stats', {'fields': readonly_fields}),
     )
-actions = [recalculate_stats]
+    actions = [recalculate_stats]
 
 # Register your models here.
 admin.site.register(Player)
