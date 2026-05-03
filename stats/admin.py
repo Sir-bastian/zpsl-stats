@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from stats.models import MatchEvent, Player, Team, Match
+from .services import update_team_standings
 
 # Inline models
 class MatchEventInline(admin.TabularInline):
@@ -19,6 +20,16 @@ class MatchAdmin(admin.ModelAdmin):
     readonly_fields = ('home_score', 'away_score')  # Scores should be updated via MatchEvent, not directly
 
 
+
+# Delete this later.
+# This is just so I can work on mobile to recalculate Standings.
+
+@admin.action(description='Recalculate selected teams stats')
+def recalculate_stats(modeladmin, request, queryset):
+    for team in queryset:
+        update_team_standings(team)
+
+
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
     # These fields can be seen but not edited in the Admin form
@@ -35,14 +46,3 @@ class TeamAdmin(admin.ModelAdmin):
 admin.site.register(Player)
 admin.site.register(Match, MatchAdmin) 
 admin.site.register(MatchEvent)
-
-
-# Delete this later.
-# This is just so I can work on mobile to recalculate Standings. 
-from django.contrib import admin
-from .services import update_team_standings
-
-@admin.action(description='Recalculate selected teams stats')
-def recalculate_stats(modeladmin, request, queryset):
-    for team in queryset:
-        update_team_standings(team)
