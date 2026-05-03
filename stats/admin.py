@@ -34,3 +34,19 @@ class TeamAdmin(admin.ModelAdmin):
 admin.site.register(Player)
 admin.site.register(Match, MatchAdmin) 
 admin.site.register(MatchEvent)
+
+
+# Delete this later.
+# This is just so I can work on mobile to recalculate Standings. 
+from django.contrib import admin
+from .services import update_team_standings
+
+@admin.action(description='Recalculate selected teams stats')
+def recalculate_stats(modeladmin, request, queryset):
+    for team in queryset:
+        update_team_standings(team)
+
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ('name', 'played', 'points')
+    actions = [recalculate_stats] # This adds a dropdown option
