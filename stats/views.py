@@ -8,7 +8,7 @@ def index(request):
     '''note: This view is for the homepage of the website. It will display the top teams, recent results and upcoming fixtures.'''
     all_teams = Team.objects.all()
     top_standings = sorted(all_teams, key=lambda t: (t.points, t.goal_difference), reverse=True)[:5]
-    recent_results = Match.objects.filter(match_status='FINISHED').select_related('home_team', 'away_team').order_by('-date') # I must remember to slice here in future
+    recent_results = Match.objects.filter(match_status='FINISHED').select_related('home_team', 'away_team').order_by('-date')[:5]
     upcoming_fixtures = Match.objects.filter(match_status='SCHEDULED').select_related('home_team', 'away_team').order_by('date')[:5]
 
     top_scorers = Player.get_top_scorers()[:10]
@@ -89,7 +89,7 @@ def team_detail(request, team_id):
     recent_results = Match.objects.filter(
         Q(home_team = team) | Q(away_team=team),
         match_status = 'FINISHED'
-    ).select_related('home_team', 'away_team').order_by('-date', '-time')[:5]
+    ).select_related('home_team', 'away_team').order_by('-date', '-time') #[:5]
 
     # Next Fixture ( The very next ONE fixture, not all upcoming fixtures)
     next_fixture = Match.objects.filter(
