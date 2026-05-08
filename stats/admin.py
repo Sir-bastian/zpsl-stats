@@ -17,7 +17,7 @@ class MatchEventInline(admin.TabularInline):
         # Extract match ID directly from the admin URL pattern matching
     resolved = request.resolver_match
     match_id = resolved.kwargs.get('object_id') if resolved else None
-        if  db_field.name in ['player', 'related_player'] and obj:
+        if  db_field.name in ['player', 'related_player'] and match_id:
             kwargs["queryset"] = Player.objects.filter(
                 team__in=[obj.home_team, obj.away_team]
             ).order_by("team", "name")
