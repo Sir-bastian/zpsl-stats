@@ -12,14 +12,14 @@ class MatchEventInline(admin.TabularInline):
     raw_id_fields = ('player', 'related_player')
     can_delete = True
 
-    def formfield_for_foreignkey(self, db_field, request, obj=None, **kwargs):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # Apply the filter to the main player and the related player (sub/assister)
         if  db_field.name in ['player', 'related_player'] and obj:
             kwargs["queryset"] = Player.objects.filter(
                 team__in=[obj.home_team, obj.away_team]
             ).order_by("team", "name")
 
-        return super().formfield_for_foreignkey(db_field, request, obj, **kwargs)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 class MatchAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'date', 'home_team', 'away_team', 'home_score', 'away_score', 'match_status')
