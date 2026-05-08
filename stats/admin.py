@@ -12,6 +12,14 @@ class MatchEventInline(admin.TabularInline):
     raw_id_fields = ('player', 'related_player')
     can_delete = True
 
+    def formfield_for_foreignkey(self, db_field, request, obj=None, **kwargs):
+        # Apply the filter to the main player and the related player (sub/assister)
+        if  db_field.name in ['player', 'related_player'] and obj:
+            kwargs["queryset"] = Player.objects.filter(
+                team__in=[obj.home_team, obj.away_team]
+            ).order_by("team", "name")
+
+        return super().formfield_for_foreignkey(db_field, request, obj, **kwargs)
 
 class MatchAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'date', 'home_team', 'away_team', 'home_score', 'away_score', 'match_status')
@@ -19,13 +27,9 @@ class MatchAdmin(admin.ModelAdmin):
 
     readonly_fields = ('home_score', 'away_score')  # Scores should be updated via MatchEvent, not directly
 
-
-
-# Delete this later.
-# This is just so I can work on mobile to recalculate Standings.
-
 @admin.action(description='Recalculate selected teams stats')
 def recalculate_stats(modeladmin, request, queryset):
+    # This functions is a button which handles reCalculate stats in admin Panel
     for team in queryset:
         update_team_standings(team)
 

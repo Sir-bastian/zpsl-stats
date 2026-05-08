@@ -135,7 +135,7 @@ class Player(models.Model):
         default=Position.MIDFIELDER
         )
     date_of_birth = models.DateField(null=True, blank=True)
-    assists = models.PositiveIntegerField(default=0) # For Future Use
+    nationality = models.CharField(max_length=50, blank=True, null=True)
     class Meta:
         # This prevents saving a player with the exact same name AND team twice
         unique_together = ('name', 'team')

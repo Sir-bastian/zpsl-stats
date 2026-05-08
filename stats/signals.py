@@ -48,8 +48,14 @@ def update_standings_on_match_save(sender, instance, **kwargs):
 def update_standings_on_match_delete(sender, instance, **kwargs):
     """
     Ensures that if a match is deleted, the team's 'Played' count 
-    and other stats are recalculated immediately.
+    and other stats are recalculated immediately. Only triggers a recalculation if the match being
+    deleted actually had impact on the log table
     """
-    # We always update because we need to 'undo' the stats from the deleted match
-    update_team_standings(instance.home_team)
-    update_team_standings(instance.away_team)
+    if instance.match_status == 'FINISHED':
+        update_team_standings(instance.home_team)
+        update_team_standings(instance.away_team)
+        # If it was scheduled or live, we do othing, No impact, no wasted CPU power.
+    else:
+        # Check if the 'finished' stats are still lingering in the team model.
+        update_team_standings(instance.home_team)
+        update_team_standings(instance.away_team)
