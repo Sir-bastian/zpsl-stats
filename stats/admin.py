@@ -13,10 +13,10 @@ class MatchEventInline(admin.TabularInline):
     can_delete = True
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-    if db_field.name in ['player', 'related_player']:
-        # Extract the current Match ID from the Admin change view URL context
-        resolved = request.resolver_match
-        match_id = resolved.kwargs.get('object_id') if resolved else None
+        if db_field.name in ['player', 'related_player']:
+           # Extract the current Match ID from the Admin change view URL context
+           resolved = request.resolver_match
+           match_id = resolved.kwargs.get('object_id') if resolved else None
         
         if match_id:
             try:
