@@ -14,6 +14,9 @@ class MatchEventInline(admin.TabularInline):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         # Apply the filter to the main player and the related player (sub/assister)
+        # Extract match ID directly from the admin URL pattern matching
+    resolved = request.resolver_match
+    match_id = resolved.kwargs.get('object_id') if resolved else None
         if  db_field.name in ['player', 'related_player'] and obj:
             kwargs["queryset"] = Player.objects.filter(
                 team__in=[obj.home_team, obj.away_team]
