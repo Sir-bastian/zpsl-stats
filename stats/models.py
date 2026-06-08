@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.db import models
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F, Sum, Case, When, IntegerField
 from django.utils.functional import cached_property
 
 # Create your models here.
@@ -168,6 +168,15 @@ class Player(models.Model):
         # Or if you record an 'ASSIST' event type specifically:
         return self.match_events.filter(event_type=MatchEvent.EventType.ASSIST).count()
     
+    @property
+    def clean_sheets(self):
+        """Calculates clean sheets for a Goalkeeper based on team performance."""
+        if self.position != self.Position.GOALKEEPER:
+            return 0
+        home_cs = self.team.home_matches.filter(match_status='FINISHED', away_score=0).count()
+        away_cs = self.team.away_matches.filter(match_status='FINISHED', home_score=0).count()
+        return home_cs + away_cs
+
     @staticmethod
     def get_top_scorers(limit=10):
         # Get players annotated with their goal counts, then order by that count
@@ -187,6 +196,19 @@ class Player(models.Model):
                 filter=Q(match_events__event_type=MatchEvent.EventType.ASSIST)
             )
         ).order_by('-assists_count')[:limit]
+
+    @staticmethod
+    def get_top_clean_sheets(limit=10):
+        """Annotates Goalkeepers with their total clean sheets count across all matches."""
+        return Player.objects.filter(position=Player.Position.GOALKEEPER).annotate(
+            clean_sheets_count=Count(
+                'team__home_matches',
+                filter=Q(team__home_matches__match_status='FINISHED', team__home_matches__away_score=0)
+            ) + Count(
+                'team__away_matches',
+                filter=Q(team__away_matches__match_status='FINISHED', team__away_matches__home_score=0)
+            )
+        ).order_by('-clean_sheets_count')[:limit]
 
     def __str__(self):
         return (

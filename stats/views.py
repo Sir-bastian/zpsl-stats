@@ -14,8 +14,8 @@ def index(request):
     top_scorers = Player.get_top_scorers()[:10]
     top_assists = Player.get_top_assists()[:10]
 
-    # Clean Sheets Logic
-    clean_sheets = sorted(all_teams, key=lambda t: getattr(t, 'clean_sheets', 0), reverse=True)[:5]
+    # Fetch top Goalkeepers by Clean Sheets
+    clean_sheets = Player.get_top_clean_sheets(5)
 
     return render(request, 'stats/home.html', {
         'standings': top_standings,

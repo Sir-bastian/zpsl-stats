@@ -158,10 +158,10 @@
                     <tr><th class="ps-3">Club / Goalkeeper</th><th class="text-end pe-3">CS</th></tr>
                 </thead>
                 <tbody>
-                    {% for team in clean_sheets %}
+                    {% for player in clean_sheets %}
                     <tr>
-                        <td class="ps-3"><strong>{{ team.name }}</strong></td>
-                        <td class="text-end pe-3 fw-bold text-success">{{ team.clean_sheets|default:0 }}</td>
+                        <td class="ps-3"><strong>{{ player.name }}</strong><br><span class="text-muted tiny">{{ player.team.name }}</span></td>
+                        <td class="text-end pe-3 fw-bold text-success">{{ player.clean_sheets_count|default:0 }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
