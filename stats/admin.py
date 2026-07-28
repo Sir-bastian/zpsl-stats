@@ -1,16 +1,32 @@
 from django.contrib import admin
-from django.db import models
+from django.db.models import Q
 from stats.models import MatchEvent, Player, Team, Match
 from .services import update_team_standings
 
 # Inline models
+
+@admin.register(Player)
+class PlayerAdmin(admin.ModelAdmin):
+    # search functionality used by the autocomplete bars
+    search_fields = ['name', 'team__name']
+    list_display = ['name', 'team', 'position', 'age']
+
 class MatchEventInline(admin.TabularInline):
     model = MatchEvent
     extra = 1
 
-    fields = ('event_type', 'minute', 'player', 'related_player')
-    raw_id_fields = ('player', 'related_player')
+    fields = ['event_type', 'minute', 'player', 'related_player']
+    autocomplete_fields = ['player', 'related_player']
     can_delete = True
+
+    def formfield_for_foreignkey(self, db_field, request, obj=None, **kwargs):
+        # Obj is the instance of the parent model (Match) being edited. We can use it to filter the players based on the teams in the match.
+        if db_field.name in ["player", "related_player"] and obj:
+            # Filter players to only those in the home or away team of the match.
+            kwargs["queryset"] = Player.objects.filter(
+                Q(team=obj.home_team) | Q(team=obj.away_team)
+            )
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 class MatchAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'date', 'home_team', 'away_team', 'home_score', 'away_score', 'match_status')
@@ -38,6 +54,6 @@ class TeamAdmin(admin.ModelAdmin):
     actions = [recalculate_stats]
 
 # Register your models here.
-admin.site.register(Player)
+
 admin.site.register(Match, MatchAdmin) 
 admin.site.register(MatchEvent)
